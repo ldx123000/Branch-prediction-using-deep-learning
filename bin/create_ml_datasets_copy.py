@@ -11,12 +11,12 @@ import common
 
 
 # TARGET_BENCHMARKS = ['leela']
-HARD_BR_DIR = '/home2/dongxu/BranchNet/hard_br'
-HARD_BR_ACC_DIR = '/home2/dongxu/BranchNet/hard_br_acc'
+HARD_BR_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../hard_br'
+HARD_BR_ACC_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../hard_br_acc'
 HARD_BRS_FILE = 'top50'
 NUM_THREADS = 32
 PC_BITS = 30
-
+LOW_ACC_HARD_BR_FILES = False
 
 def read_branch_trace(trace_path):
     struct_type = [
@@ -73,13 +73,14 @@ def get_work_items(work_items, TRACES_DIR, DATASETS_DIR):
 
         accuracy = 0
         try:
-            with open (hard_br_acc_path) as f1:
-                content = f1.read()
-                accuracy_str = re.search(r"\d+\.\d+%", content).group()
-                accuracy = float(accuracy_str[:-1]) / 100    
-            if accuracy > 0.95:
-                continue
-            print(accuracy)
+            if LOW_ACC_HARD_BR_FILES:
+                with open (hard_br_acc_path) as f1:
+                    content = f1.read()
+                    accuracy_str = re.search(r"\d+\.\d+%", content).group()
+                    accuracy = float(accuracy_str[:-1]) / 100    
+                if accuracy > 0.95:
+                    continue
+                print(accuracy)
             with open (hard_br_path) as f:
                 hard_brs =[int(x,16) for x in f.read().splitlines()]
             processed = os.path.exists(dataset_path) 
@@ -124,12 +125,11 @@ def gen_dataset(trace_path, dataset_path, hard_brs):
 
 
 def main():
-    TRAINING_TRACES_DIR = '/home2/dongxu/BranchNet/traces_test/training'
-    TRAINING_DATASETS_DIR = '/home2/dongxu/BranchNet/dataset_pre/training'
-    EVAL_TRACES_DIR = '/home2/dongxu/BranchNet/traces_test/eval'
-    EVAL_DATASETS_DIR = '/home2/dongxu/BranchNet/dataset_pre/eval'
-    #TEST_TRACES_DIR = '/home2/dongxu/BranchNet/traces_csv/test'
-    #TEST_DATASETS_DIR = '/home2/dongxu/BranchNet/dataset/test'   
+    TRAINING_TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../traces/training'
+    TRAINING_DATASETS_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../dataset/training'
+    EVAL_TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../traces/eval'
+    EVAL_DATASETS_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../dataset/eval'
+
     work_items=[]
     get_work_items(work_items,TRAINING_TRACES_DIR, TRAINING_DATASETS_DIR)
     get_work_items(work_items,EVAL_TRACES_DIR, EVAL_DATASETS_DIR)

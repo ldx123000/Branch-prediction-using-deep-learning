@@ -95,107 +95,39 @@ Args parse_args(int argc, char** argv) {
     return {argv[1], argv[2], std::stoi(argv[3]), argv[4]};
 } 
 
-//
-// bz2
-//
-
-// int main(int argc, char** argv) {
-//   const auto args     = parse_args(argc, argv);
-//   const auto br_trace = read_trace(args.input_trace_path, args.max_brs);
-
-//   auto  predictor = std::make_unique<PREDICTOR>(args.hard_br_file_path);
-//   Stats stats;
-
-//   for(const auto& br : br_trace) {
-//     if(br.type == BR_TYPE::COND_DIRECT || br.type == BR_TYPE::COND_INDIRECT) {
-//       const bool pred = predictor->GetPrediction(br.pc);
-//       predictor->UpdatePredictor(br.pc, convert_brtype_to_optype(br.type),
-//                                  br.direction, pred, br.target);
-//       stats.update(br.pc, pred, br.direction);
-//     } else {
-//       predictor->TrackOtherInst(br.pc, convert_brtype_to_optype(br.type),
-//                                 br.direction, br.target);
-//     }
-//   }
-
-//   stats.dump(args.output_file_path);
-// }
-
-//
-// bz2 content
-//
-
 int main(int argc, char** argv) {
   const auto args     = parse_args(argc, argv);
-  const auto br_trace = read_trace(args.input_trace_path, args.max_brs);
+  Stats stats;
+  auto  predictor = std::make_unique<PREDICTOR>(args.hard_br_file_path);
 
-  std::ofstream ofs(args.output_file_path);
-  ofs << "pc,target,direction,type,opcode\n";
-  for(const auto& br : br_trace) {
-    ofs << std::to_string(br.pc)+","+std::to_string(br.target)+","+std::to_string(br.direction ? 1 : 0) + "," + std::to_string(static_cast<int>(br.type)) + "," + std::to_string(br.opcode)  << "\n";
+  std::string str(args.input_trace_path);
+  if(str.find(".bt9.trace.gz")){
+    std::vector<BT9> br_trace = read_trace_bt9(args.input_trace_path, args.max_brs);
+    for(int i = 1; i < br_trace.size(); i++) {
+      auto br = br_trace.at(i);
+      if(br.type == OpType::OPTYPE_JMP_DIRECT_COND || br.type == OpType::OPTYPE_JMP_INDIRECT_COND) {
+        const bool pred = predictor->GetPrediction(br.pc);
+        predictor->UpdatePredictor(br.pc, br.type,
+                                  br.direction, pred, br.target);
+        stats.update(br.pc, pred, br.direction);
+      } else {
+        predictor->TrackOtherInst(br.pc, br.type,
+                                  br.direction, br.target);
+      }
+    }
+  }else if(str.find(".bz2")){
+    const auto br_trace = read_trace(args.input_trace_path, args.max_brs);
+    for(const auto& br : br_trace) {
+      if(br.type == BR_TYPE::COND_DIRECT || br.type == BR_TYPE::COND_INDIRECT) {
+        const bool pred = predictor->GetPrediction(br.pc);
+        predictor->UpdatePredictor(br.pc, convert_brtype_to_optype(br.type),
+                                  br.direction, pred, br.target);
+        stats.update(br.pc, pred, br.direction);
+      } else {
+        predictor->TrackOtherInst(br.pc, convert_brtype_to_optype(br.type),
+                                  br.direction, br.target);
+      }
+    }
   }
+  stats.dump(args.output_file_path);
 }
-
-
-//
-// run tage to get result
-//
-
-// int main(int argc, char** argv) {
-//   const auto args     = parse_args(argc, argv);
-//   std::vector<BT9> br_trace = read_trace_bt9(args.input_trace_path, args.max_brs);
-
-//   auto  predictor = std::make_unique<PREDICTOR>(args.hard_br_file_path);
-//   Stats stats;
-
-//   for(int i = 1; i < br_trace.size(); i++) {
-//     auto br = br_trace.at(i);
-//     if(br.type == OpType::OPTYPE_JMP_DIRECT_COND || br.type == OpType::OPTYPE_JMP_INDIRECT_COND) {
-//       const bool pred = predictor->GetPrediction(br.pc);
-//       predictor->UpdatePredictor(br.pc, br.type,
-//                                  br.direction, pred, br.target);
-//       stats.update(br.pc, pred, br.direction);
-//     } else {
-//       predictor->TrackOtherInst(br.pc, br.type,
-//                                 br.direction, br.target);
-//     }
-//   }
-
-//   stats.dump(args.output_file_path);
-// }
-
-//
-// get csv
-//
-
-// int main(int argc, char** argv) {
-//   const auto args     = parse_args(argc, argv);
-//   // std::string str(args.input_trace_path);
-//   // cout << "input: " << args.input_trace_path << " max_brs: " << args.max_brs << " output: " << args.output_file_path << endl;
-//   std::vector<BT9> br_trace = read_trace_bt9(args.input_trace_path, args.max_brs);
-//   // auto  predictor = std::make_unique<PREDICTOR>(args.hard_br_file_path);
-//   // Stats stats;
-//   // // cout << "branch trace size: " << br_trace.size() << endl;
-//   // for(int i = 1; i < br_trace.size(); i++) {
-//   //   auto br = br_trace.at(i);
-//   //   if(br.type == OpType::OPTYPE_JMP_DIRECT_COND || br.type == OpType::OPTYPE_JMP_INDIRECT_COND) {
-//   //     const bool pred = predictor->GetPrediction(br.pc);
-//   //     predictor->UpdatePredictor(br.pc, br.type,
-//   //                                br.direction, pred, br.target);
-//   //     stats.update(br.pc, pred, br.direction);
-//   //   } else {
-//   //     predictor->TrackOtherInst(br.pc, br.type,
-//   //                               br.direction, br.target);
-//   //   }
-//   //   // if (i % 5000000 == 0) {
-//   //   //     cout << "check " + std::to_string(i) + "th pred: " << " " << br.to_string() << endl;
-//   //   // }
-//   // }
-
-//   // stats.dump(args.output_file_path);
-//   std::ofstream ofs(args.output_file_path);
-//   ofs << "pc,target,direction,type,opcode\n";
-//   for(int i = 1; i < br_trace.size(); i++) {
-//     ofs << br_trace[i].to_string() << "\n";
-//   }
-// }

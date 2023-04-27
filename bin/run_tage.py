@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
 
 import common
-from common import PATHS, BENCHMARKS_INFO
+# from common import PATHS, BENCHMARKS_INFO
 import os
 
-TARGET_BENCHMARKS = ['leela']
 BINARY_NAME = 'tagescl64'
 CONFIG_NAME = 'tagescl64'
 NUM_THREADS = 32
+TRACES_DIR = '/home2/dongxu/cbp2016.eval/traces/trainingTraces'
+STATS_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../tage_stats'
+FILE_SUFFIX = '.csv' 
 
 def main():
     tage_binary = os.path.dirname(os.path.abspath(__file__)) + '/../build/tage/' + BINARY_NAME
     assert os.path.exists(tage_binary), 'Could not find the TAGE binary at ' + tage_binary
+    # os.makedirs(OUT_DIR, exist_ok=True)
+    os.makedirs(STATS_DIR, exist_ok=True)
 
     cmds = []
-    for benchmark in TARGET_BENCHMARKS:
-        traces_dir = '{}/{}'.format(PATHS['branch_traces_dir'], benchmark)
-        stats_dir = '{}/{}/{}'.format(PATHS['tage_stats_dir'], CONFIG_NAME, benchmark)
-        os.makedirs(stats_dir, exist_ok=True)
-        for inp_info in BENCHMARKS_INFO[benchmark]['inputs']:
-            for simpoint_info in inp_info['simpoints']:
-                id = simpoint_info['id']
-                file_basename = '{}_{}_simpoint{}'.format(benchmark, inp_info['name'], id)
-                trace_path = ('{}/{}_brtrace.bz2').format(traces_dir, file_basename)
-                stats_path = ('{}/{}_stats.csv').format(stats_dir, file_basename)
-                out_file = ('{}/{}_run.out').format(stats_dir, file_basename)
-
-                cmd = '{} {} {} &> {}'.format(tage_binary, trace_path, stats_path, out_file)
-                cmds.append(cmd)
-
+    for trace in os.listdir(TRACES_DIR):
+        trace_path = os.path.join(TRACES_DIR,trace)
+        if os.path.isfile(trace_path) and '.bt9.trace.gz' in trace:
+            #out_file = ('{}/{}_{}').format(OUT_DIR, trace[:-13],FILE_SUFFIX)
+            stats_file = ('{}/{}_{}{}').format(STATS_DIR, trace[:-13],CONFIG_NAME, FILE_SUFFIX)
+            processed = os.path.exists(stats_file) 
+            if processed:
+                continue
+            cmd = '{} {} {}'.format(tage_binary, trace_path, stats_file)
+            # cmd = '{} {} {}'.format(tage_binary, trace_path, out_file)
+            cmds.append(cmd)
+    if len(cmds) == 0:
+        print("all traces done")    
     common.run_parallel_commands_local(cmds, NUM_THREADS)
 
 
