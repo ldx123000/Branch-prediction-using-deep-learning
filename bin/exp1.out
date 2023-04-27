@@ -1,0 +1,30 @@
+/home/zhizhi/BranchNet/bin/./run_ml_jobs_copy.py:149: NumbaWarning: [1m
+Compilation is falling back to object mode WITH looplifting enabled because Function "main" failed type inference due to: [1mUntyped global name 'create_workdirs':[0m [1m[1mCannot determine Numba type of <class 'function'>[0m
+[1m
+File "run_ml_jobs_copy.py", line 152:[0m
+[1mdef main():
+    <source elided>
+    if CREATE_WORKDIRS:
+[1m        create_workdirs()
+[0m        [1m^[0m[0m
+[0m[0m
+  @jit
+/home/zhizhi/.local/lib/python3.10/site-packages/numba/core/object_mode_passes.py:151: NumbaWarning: [1mFunction "main" was compiled in object mode without forceobj=True.
+[1m
+File "run_ml_jobs_copy.py", line 150:[0m
+[1m@jit
+[1mdef main():
+[0m[1m^[0m[0m
+[0m
+  warnings.warn(errors.NumbaWarning(warn_msg,
+/home/zhizhi/.local/lib/python3.10/site-packages/numba/core/object_mode_passes.py:161: NumbaDeprecationWarning: [1m
+Fall-back from the nopython compilation path to the object mode compilation path has been detected, this is deprecated behaviour.
+
+For more information visit https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit
+[1m
+File "run_ml_jobs_copy.py", line 150:[0m
+[1m@jit
+[1mdef main():
+[0m[1m^[0m[0m
+[0m
+  warnings.warn(errors.NumbaDeprecationWarning(msg,

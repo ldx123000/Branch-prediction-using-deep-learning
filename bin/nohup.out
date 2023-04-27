@@ -1,0 +1,88 @@
+Traceback (most recent call last):
+  File "/home/zhizhi/BranchNet/bin/./run_tage_on_traces.py", line 38, in <module>
+    main()
+  File "/home/zhizhi/BranchNet/bin/./run_tage_on_traces.py", line 18, in main
+    os.makedirs(OUT_DIR, exist_ok=True)
+NameError: name 'OUT_DIR' is not defined
+Traceback (most recent call last):
+  File "/home/zhizhi/BranchNet/bin/./run_tage_on_traces.py", line 38, in <module>
+    main()
+  File "/home/zhizhi/BranchNet/bin/./run_tage_on_traces.py", line 18, in main
+    os.makedirs(OUT_DIR, exist_ok=True)
+NameError: name 'OUT_DIR' is not defined
+Process ForkPoolWorker-23:
+Traceback (most recent call last):
+  File "/home/zhizhi/BranchNet/bin/./run_tage_on_traces.py", line 40, in <module>
+    main()
+  File "/home/zhizhi/BranchNet/bin/./run_tage_on_traces.py", line 36, in main
+    common.run_parallel_commands_local(cmds, NUM_THREADS)
+  File "/home/zhizhi/BranchNet/bin/common.py", line 44, in run_parallel_commands_local
+    pool.map(run_cmd_using_shell, cmds)
+  File "/usr/lib/python3.10/multiprocessing/pool.py", line 364, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+  File "/usr/lib/python3.10/multiprocessing/pool.py", line 765, in get
+    self.wait(timeout)
+  File "/usr/lib/python3.10/multiprocessing/pool.py", line 762, in wait
+    self._event.wait(timeout)
+  File "/usr/lib/python3.10/threading.py", line 600, in wait
+    signaled = self._cond.wait(timeout)
+  File "/usr/lib/python3.10/threading.py", line 320, in wait
+    waiter.acquire()
+KeyboardInterrupt
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_SERVER-65.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_SERVER-65_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_SERVER-32.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_SERVER-32_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_MOBILE-39.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_MOBILE-39_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_SERVER-94.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_SERVER-94_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_SERVER-127.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_SERVER-127_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_MOBILE-45.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_MOBILE-45_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_MOBILE-46.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_MOBILE-46_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_SERVER-56.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_SERVER-56_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/SHORT_SERVER-97.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/SHORT_SERVER-97_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/LONG_MOBILE-17.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/LONG_MOBILE-17_.csv
+Killed
+Killed
+Killed
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/evaluationTraces/SHORT_MOBILE-101.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/eval/SHORT_MOBILE-101_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/evaluationTraces/SHORT_SERVER-195.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/eval/SHORT_SERVER-195_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/evaluationTraces/SHORT_SERVER-51.bt9.trace.gz /home/zhizhi/BranchNet/traces_csv/eval/SHORT_SERVER-51_.csv
+Running cmd: /home/zhizhi/BranchNet/bin/../build/tage/tagescl64 /home/zhizhi/cbp2016.eval/traces/evaluationTraces/SHORT_SERProcess ForkPoolWorker-25:
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3.10/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+  File "/usr/lib/python3.10/multiprocessing/pool.py", line 51, in starmapstar
+    return list(itertools.starmap(args[0], args[1]))
+  File "/home/zhizhi/BranchNet/bin/./create_ml_datasets_copy.py", line 79, in gen_dataset
+    pcs, directions = read_branch_trace(trace_path)
+  File "/home/zhizhi/BranchNet/bin/./create_ml_datasets_copy.py", line 27, in read_branch_trace
+    x = np.genfromtxt(trace_path,delimiter=',',dtype=record_dtype)
+  File "/usr/local/lib/python3.10/dist-packages/numpy/lib/npyio.py", line 2211, in genfromtxt
+    if len(rows) == max_rows:
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/home/zhizhi/BranchNet/bin/./create_ml_datasets_copy.py", line 119, in <module>
+    main()
+  File "/home/zhizhi/BranchNet/bin/./create_ml_datasets_copy.py", line 115, in main
+    pool.starmap(gen_dataset, work_items)
+  File "/usr/lib/python3.10/multiprocessing/pool.py", line 372, in starmap
+    return self._map_async(func, iterable, starmapstar, chunksize).get()
+  File "/usr/lib/python3.10/multiprocessing/pool.py", line 765, in get
+    self.wait(timeout)
+  File "/usr/lib/python3.10/multiprocessing/pool.py", line 762, in wait
+    self._event.wait(timeout)
+  File "/usr/lib/python3.10/threading.py", line 600, in wait
+    signaled = self._cond.wait(timeout)
+  File "/usr/lib/python3.10/threading.py", line 320, in wait
+    waiter.acquire()
+KeyboardInterrupt
+0.905352065423555
+0.9378793721244467
+0.8222277182475756
+0.8867405288582524
+0.905352065423555
+0.9378793721244467
+0.8222277182475756
+0.8867405288582524
