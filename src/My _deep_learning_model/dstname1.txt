@@ -1,0 +1,5 @@
+embedding_table.weight
+conv.weight
+fc1.weight
+fc1.bias
+fc3.weight

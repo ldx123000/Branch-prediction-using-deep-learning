@@ -1,0 +1,17 @@
+embedding_table.weight
+conv.weight
+conv.bias
+batchnorm_CON.weight
+batchnorm_CON.bias
+batchnorm_CON.running_mean
+batchnorm_CON.running_var
+batchnorm_CON.num_batches_tracked
+fc1.weight
+fc1.bias
+batchnorm_fc1.weight
+batchnorm_fc1.bias
+batchnorm_fc1.running_mean
+batchnorm_fc1.running_var
+batchnorm_fc1.num_batches_tracked
+fc3.weight
+fc3.bias
