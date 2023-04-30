@@ -7,16 +7,19 @@ import os
 import struct
 
 import common
-# from common import PATHS, BENCHMARKS_INFO
+from common import PATHS
 
-
-# TARGET_BENCHMARKS = ['leela']
-HARD_BR_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../hard_br'
-HARD_BR_ACC_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../hard_br_acc'
+HARD_BR_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['hard_br_dir']
+HARD_BR_ACC_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['hard_br_acc_dir']
 HARD_BRS_FILE = 'top50'
 NUM_THREADS = 32
 PC_BITS = 30
 LOW_ACC_HARD_BR_FILES = False
+
+TRAINING_TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['output_traces_dir'] + '/training'
+TRAINING_DATASETS_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['dataset_dir'] + '/training'
+TEST_TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['output_traces_dir'] + '/test'
+TEST_DATASETS_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['dataset_dir'] + '/test'
 
 def read_branch_trace(trace_path):
     struct_type = [
@@ -125,18 +128,10 @@ def gen_dataset(trace_path, dataset_path, hard_brs):
 
 
 def main():
-    TRAINING_TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../traces/training'
-    TRAINING_DATASETS_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../dataset/training'
-    EVAL_TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../traces/eval'
-    EVAL_DATASETS_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../dataset/eval'
-
     work_items=[]
     get_work_items(work_items,TRAINING_TRACES_DIR, TRAINING_DATASETS_DIR)
-    get_work_items(work_items,EVAL_TRACES_DIR, EVAL_DATASETS_DIR)
+    get_work_items(work_items,TEST_TRACES_DIR, TEST_DATASETS_DIR)
 
-
-    #work_items.append(get_work_items(TEST_TRACES_DIR, TEST_DATASETS_DIR))
-    # return
     with multiprocessing.Pool(NUM_THREADS) as pool:
         pool.starmap(gen_dataset, work_items)
 

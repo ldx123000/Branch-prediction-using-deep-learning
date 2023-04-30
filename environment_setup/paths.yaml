@@ -1,0 +1,15 @@
+train_traces_dir: /../cbp2016.eval/traces/trainingTraces
+test_traces_dir: /../cbp2016.eval/traces/evaluationTraces
+
+output_traces_dir: '/../traces'
+
+tage_stats_dir: '/../tage_stats'
+
+hard_br_dir: '/../hard_br'
+hard_br_acc_dir: '/../hard_br_acc'
+
+dataset_dir: '/../dataset_good'
+
+result_BranchNet: '/../result_BranchNet'
+result_CNN: '/../result_CNN'
+result_SNN: '/../result_SNN'

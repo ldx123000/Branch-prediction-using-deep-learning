@@ -8,30 +8,16 @@ import yaml
 
 SIMPOINT_LENGTH = 200000000
 
-# __env_dir__ = os.path.dirname(__file__) + '/../environment_setup'
-# __paths_file__ = __env_dir__ + '/paths.yaml'
-# __benchmarks_file__ = __env_dir__ + '/benchmarks.yaml'
-# __ml_input_partitions__ = __env_dir__ + '/ml_input_partitions.yaml'
+__env_dir__ = os.path.dirname(__file__) + '/../environment_setup'
+__paths_file__ = __env_dir__ + '/paths.yaml'
 
 
-# assert os.path.exists(__paths_file__), (
-#   ('Expecting a paths.yaml file at {}. You have to create one following '
-#    'the format of paths_example.yaml in the same directory').format(__paths_file__))
-# assert os.path.exists(__benchmarks_file__), (
-#   ('Expecting a benchmarks.yaml file at {}. You have to create one following '
-#    'the format of benchmarks_example.yaml in the same directory').format(__benchmarks_file__))
-# assert os.path.exists(__ml_input_partitions__), (
-#   ('Expecting an ml_input_partitions.yaml file at {}. You have to create one following '
-#    'the format of ml_input_partitions_example.yaml in the same directory').format(__ml_input_partitions__))
+assert os.path.exists(__paths_file__), (
+  ('Expecting a paths.yaml file at {}. You have to create one following '
+   'the format of paths_example.yaml in the same directory').format(__paths_file__))
 
-# with open(__paths_file__) as f:
-#   PATHS = yaml.safe_load(f)
-
-# with open(__benchmarks_file__) as f:
-#   BENCHMARKS_INFO = yaml.safe_load(f)
-
-# with open(__ml_input_partitions__) as f:
-#   ML_INPUT_PARTIONS = yaml.safe_load(f)
+with open(__paths_file__) as f:
+  PATHS = yaml.safe_load(f)
 
 
 def run_cmd_using_shell(cmd):
@@ -112,20 +98,6 @@ class AggregateBranchStats:
     self.unweighted_stats.InitWithCorrect(unweighted_correct, unweighted_total, unweighted_instructions)
 
 
-def get_simpoint_info(benchmark, inp):
-    inps_info = BENCHMARKS_INFO[benchmark]['inputs']
-    for inp_info in inps_info:
-        if inp_info['name'] == inp:
-            return inp_info['simpoints']
-    else:
-        assert False, 'Did not find information about benchmark {}, input {}'.format(benchmark, inp)
-
-
-def get_simpoint_weights(benchmark, inp):
-    simpoint_info = get_simpoint_info(benchmark, inp)
-    return [simpoint['weight'] for simpoint in simpoint_info]
-
-
 def update_tage_stats(tage_stats, stats_file, num_simpoints, simpoint_id):
     PC_COLUMN_IDX = 0
     CORRECT_COLUMN_IDX = 3
@@ -147,28 +119,6 @@ def update_tage_stats(tage_stats, stats_file, num_simpoints, simpoint_id):
                 tage_stats[br] = AggregateBranchStats(num_simpoints)
             tage_stats[br].region_stats[simpoint_id].InitWithCorrect(
                 correct, total)
-
-
-def read_tage_stats(tage_config_name, ml_benchmark, inp, hard_brs_tag=None):
-    spec_benchmark = ML_INPUT_PARTIONS[ml_benchmark]['spec_name']
-    weights = get_simpoint_weights(spec_benchmark, inp)
-    num_simpoints = len(weights)
-    stats_dir = '{}/{}{}/{}'.format(
-        PATHS['tage_stats_dir'], 
-        ('/noalloc_for_hard_brs_' + hard_brs_tag) if hard_brs_tag else '',
-        tage_config_name,
-        spec_benchmark)
-
-    tage_stats = {}
-    for simpoint in get_simpoint_info(spec_benchmark, inp):
-        stats_file = ('{}/{}_{}_simpoint{}_stats.csv').format(
-            stats_dir, spec_benchmark, inp, simpoint['id'])
-        update_tage_stats(tage_stats, stats_file, num_simpoints, simpoint['id'])
-
-    for stats in tage_stats.values():
-        stats.finalize_stats(weights)
-    return tage_stats
-
 
 def read_hard_brs(benchmark, name):
     filepath = '{}/{}_{}'.format( PATHS['hard_brs_dir'], benchmark, name)
@@ -198,21 +148,3 @@ def update_cnn_stats(cnn_stats, tage_stats, results_file, num_simpoints, target_
 
             cnn_stats[br].region_stats[simpoint_region].InitWithAccuracy(
                 accuracy, tage_stats[br].region_stats[simpoint_region].total)
-
-
-def read_cnn_stats(ml_benchmark, experiment_name, inp, tage_stats):
-    spec_benchmark = ML_INPUT_PARTIONS[ml_benchmark]['spec_name']
-    weights = get_simpoint_weights(spec_benchmark, inp)
-    num_simpoints = len(weights)
-    results_dir = '{}/{}/{}/results'.format(PATHS['experiments_dir'], experiment_name, ml_benchmark)
-
-    cnn_stats = {}
-    results_files = glob.glob(results_dir + '/*.csv')
-    assert results_files
-    for results_file in results_files:
-        update_cnn_stats(cnn_stats, tage_stats, results_file, num_simpoints, inp)
-
-    for stats in cnn_stats.values():
-        stats.finalize_stats(weights)
-    cnn_stats[-1] = AggregateBranchStats(num_simpoints)
-    return cnn_stats

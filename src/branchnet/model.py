@@ -8,6 +8,7 @@ import numpy as np
 import random
 import torch
 import torch.nn as nn
+import global_var
 
 
 class BranchNetTrainingPhaseKnobs:
@@ -73,7 +74,6 @@ def extract_slice_history(x, config, global_shift, slice_id):
   else:
     return x[:, -slice_size:]
 
-
 class Slice(nn.Module):
   """A Pytorch neural network module class to define a BranchNet slice
     corresponding to some portion of the history.
@@ -83,6 +83,7 @@ class Slice(nn.Module):
     """Creates all the layers and computes the expected output size.
     """
     super(Slice, self).__init__()
+    self.printed = False
     history_length = config['history_lengths'][slice_id]
     conv_filters = config['conv_filters'][slice_id]
     conv_width = config['conv_widths'][slice_id]
@@ -104,6 +105,8 @@ class Slice(nn.Module):
 
     # Declare all the neural network layers
     index_width = pc_hash_bits if hash_dir_with_pc else (pc_hash_bits + 1)
+    # print('index_width')
+    # print(index_width)
     if self.lut_convolution:
       if config['combined_hash_convolution']:
         assert not hash_dir_with_pc
@@ -166,8 +169,13 @@ class Slice(nn.Module):
     assert num_output_bits < 32
     self.hash_metadata = nn.Parameter(torch.randint(
         0, 2 ** num_output_bits, size=[num_input_bits], dtype=torch.int64), requires_grad=False)
+    print("hash metadata")
+    print(self.hash_metadata)
 
   def hash_using_metadata(self, x, conv_width):
+    print("hashing input")
+    print(x)
+    print(conv_width)
     batch_size = x.shape[0]
     available_history = x.shape[1]
     output_history = available_history + 1 - conv_width
@@ -183,7 +191,8 @@ class Slice(nn.Module):
         metadata_idx = conv_pos * bits_per_conv_pos + bit
         xor_pattern = self.hash_metadata[metadata_idx: metadata_idx + 1]
         out = out ^ torch.where((history_slice >> bit) & 1 == 1, xor_pattern, zero_tensor)
-    
+    print("hashing output")
+    print(out)
     return out
 
 
@@ -193,6 +202,7 @@ class Slice(nn.Module):
     conv_width = self.config['conv_widths'][self.slice_id]
     pooling_width = self.config['pooling_widths'][self.slice_id]
 
+    global add_sum,multi_sum
     if self.lut_convolution:
       if self.config['combined_hash_convolution']:
         x = self.hash_using_metadata(x, conv_width)
@@ -230,6 +240,13 @@ class Slice(nn.Module):
         x = self.conv(x)
         x = self.batchnorm(x)
         x = self.convolution_activation(x)
+        if global_var.get_value('is_sum')==1:
+          add_sum = global_var.get_value('add_sum')
+          add_sum+=x.size(0)*x.size(1)*x.size(2)*conv_width
+          global_var.set_value('add_sum',add_sum)
+          multi_sum = global_var.get_value('multi_sum')
+          multi_sum+=x.size(0)*x.size(1)*x.size(2)*conv_width
+          global_var.set_value('multi_sum',multi_sum)
 
     # pooling
     if pooling_width == -1 or (self.config['shifting_pooling'][self.slice_id]
@@ -237,6 +254,14 @@ class Slice(nn.Module):
       x = torch.sum(x, 2, keepdim=True)
     elif pooling_width > 0:
       x = self.pooling(x) * pooling_width
+    
+    if global_var.get_value('is_sum')==1:
+      add_sum = global_var.get_value('add_sum')
+      add_sum+=x.size(0)*x.size(1)*x.size(2)*(pooling_width-1)
+      global_var.set_value('add_sum',add_sum)
+      multi_sum = global_var.get_value('multi_sum')
+      multi_sum+=x.size(0)*x.size(1)*x.size(2)
+      global_var.set_value('multi_sum',multi_sum)
 
     x = self.sumpooling_activation(x)
 
@@ -350,6 +375,9 @@ class FCLayer(nn.Module):
     self.quantized_act_bits = quantized_act_bits
     self.quantized_weight_bits = quantized_weight_bits
 
+    self.input_dim = input_dim
+    self.output_dim = output_dim
+ 
     self.weight = nn.Parameter(torch.empty(output_dim, input_dim),
                                      requires_grad=not freeze_params)
     self.bias = nn.Parameter(torch.empty(output_dim),
@@ -364,6 +392,8 @@ class FCLayer(nn.Module):
     self.randomize_weights()
 
   def forward(self, x):
+    global add_sum,multi_sum
+
     quantize = Quantize.apply
 
     if self.quantize and self.quantized_weight_bits > 0: 
@@ -374,6 +404,13 @@ class FCLayer(nn.Module):
       weight = self.weight
 
     x = nn.functional.linear(x, weight, bias=self.bias)
+    if global_var.get_value('is_sum')==1:
+      add_sum = global_var.get_value('add_sum')
+      add_sum+=x.size(0)*self.input_dim*self.output_dim
+      global_var.set_value('add_sum',add_sum)
+      multi_sum = global_var.get_value('multi_sum')
+      multi_sum +=x.size(0)*self.input_dim*self.output_dim
+      global_var.set_value('multi_sum',multi_sum)
     if self.activation is not None:
       x = self.activation_layer(x)
     if self.use_pruning_mask:
@@ -539,10 +576,6 @@ class BranchNet(nn.Module):
         slice_outs.append(x_)
 
     x = torch.cat(slice_outs, dim=1)
-    print("debug: x=self.mlp(x)")
-    print(x.size())
-    # print("debug: self.mlp.weight.size()")
-    # print(self.mlp.weight.size())
     x = self.mlp(x)
     return x
 

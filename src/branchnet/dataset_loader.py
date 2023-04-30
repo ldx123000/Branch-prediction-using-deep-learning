@@ -1,10 +1,10 @@
+import torch
+import torch.nn as nn
+
 """
 Pytorch DataLoader for reading instances of hard to predict branches and their
 histories from a collection of hdf5 trace files.
 """
-from __future__ import print_function
-from __future__ import division
-
 
 from multiprocessing import Lock
 import numpy as np
@@ -31,13 +31,11 @@ def get_pos_weight(traces, br_pc):
 
 def remove_incomplete_histories(br_indices, history_length):
   """Filters out instances of a branch with incomplete histories.
-
   Args:
     br_indices: a numpy array of indices of the occurances of a branch
       sorted in increasing order.
     history_length: the minimum expected history length that should be
       available for each instance of the target branch.
-
   Returns:
     a sorted numpy array of indices, each is guaranteed to meet the history
       length requirement.
@@ -54,24 +52,17 @@ def remove_incomplete_histories(br_indices, history_length):
 
 def get_branch_indices(hdf5_file_ptr, br_pc):
   """Reads the indices of a given branch from an hdf5 file into a numpy array.
-
   It assumes that the hdf5 already contains the branch indices with a dataset
   name of br_indices_{Branch PC in hexadecimal}.
-
   Args:
     hdf5_file_ptr: h5py File object that is already opened for reading.
     br_pc: the PC of the target branch (as an int).
-
   Returns:
     A numpy array of the branch indices.
-
   Raises:
     An Exception if the branch indices dataset is not found in the hdf5 file.
   """
   dataset_name = 'br_indices_'+hex(br_pc)
-  print("debug - hdf5_file_ptr.keys(): " + str(hdf5_file_ptr.keys()))
-  print("debug - dataset_name: " + str(dataset_name))
- 
   if dataset_name not in hdf5_file_ptr.keys():
     raise Exception(
         'hdf5 file {} does not contain the indices'
@@ -82,19 +73,16 @@ def get_branch_indices(hdf5_file_ptr, br_pc):
 
 def preprocess_history(history, pc_bits, pc_hash_bits, hash_dir_with_pc, dtype):
   """Preprocesses a history array by hashing the PC in each history element.
-
   It takes the least significant bits of the PC (controlled by argument
     pc_bits) and hashes them into potentially fewer number of bits (controlled
     by pc_hash_bits argument) and concatenates the PC with direction bit. After
     the hashing, it converts the array to the desired numpy data type.
-
   Args:
     history: history as a numpy array.
     pc_bits : The number of least significant bits of the PC to use in
       the history.
     pc_hash_bits : The width of PC hash that is produced for input
     dtype: the desired output numpu data type.
-
   Returns:
     a numpy array containing the hashed history with the desired data type.
   """
@@ -132,7 +120,6 @@ def preprocess_history(history, pc_bits, pc_hash_bits, hash_dir_with_pc, dtype):
 
 class TraceFileAccessor():
   """Wrapper for random accesses to an hdf5 trace file.
-
   Attributes:
     history_length (int): Length of history to read for each branch instance.
     pc_bits (int): The number of least significant bits of the PC to use
@@ -152,12 +139,9 @@ class TraceFileAccessor():
                br_pc, history_length, pc_bits, pc_hash_bits, hash_dir_with_pc, in_mem,
                keep_file_open):
     """Initializes class attributes.
-
     Optionally, reads and preprocesses the whole branch trace into memory.
-
     Args:
       br_pc (int): the PC of the target branch.
-
     See class attributes for description of other arguments.
     """
     assert pc_bits >= pc_hash_bits
@@ -195,7 +179,6 @@ class TraceFileAccessor():
 
   def get_history(self, occurance_idx):
     """Gets the chunk of the trace containing the target branch and its history.
-
     Returns:
       A numpy array taken from the branch history including an occurance of
         the target branch and its history.
@@ -226,7 +209,6 @@ class TraceFileAccessor():
 
   def num_instances(self):
     """Gets the number of instances of the branch in this trace.
-
     Returns:
       The length of self.br_indices, which equals to the number of
         occurances of the target branch.
@@ -237,16 +219,12 @@ class TraceFileAccessor():
     if self.file_ptr is not None:
       self.file_ptr.close()
 
-
-
 class BranchDataset(Dataset):
   """A pytorch dataset class that for reading branch traces from hdf5 traces.
-
   A dataset class can be used with pytorch Dataloader to feed
     branch traces into a pytorch neural network model. This class provides a
     unified logical view for all the given trace files and provides a random
     accessor from the combined set of traces.
-
   Attributes:
     trace_accessors : A list of TraceFileAccessor objects for each trace file.
     locks (optional): A list of multiprocessing Lock objects associated with
@@ -263,7 +241,6 @@ class BranchDataset(Dataset):
                in_mem=True, use_lock=False):
     """Creates a TraceFileAccessor for each trace_path and sets
     trace_end_instances to provide a unified global view to all traces.
-
     Args:
       trace_paths (str): A list of file paths of the trace files.
       br_pc (int): the PC of the target branch.
@@ -283,9 +260,6 @@ class BranchDataset(Dataset):
     self.locks = [None]
     self.trace_end_instances = np.array([-1])
     self.use_lock = use_lock
-
-    print('Debug: trace_paths: ')
-    print(trace_paths)
 
     for i, trace_path in enumerate(trace_paths):
       trace_accessor = TraceFileAccessor(

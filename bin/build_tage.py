@@ -7,8 +7,6 @@ import os
 
 build_dir_path = os.path.dirname(os.path.abspath(__file__)) + '/../build/tage'
 tage_dir_path = os.path.dirname(os.path.abspath(__file__)) + '/../src/tage'
-# build_dir_path = '/home2/dongxu/BranchNet/build/tage'
-# tage_dir_path = '/home2/dongxu/BranchNet/src/tage'
 
 print(__file__)
 print(build_dir_path)

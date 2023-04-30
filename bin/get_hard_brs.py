@@ -3,11 +3,11 @@
 import os
 
 import common
-# from common import PATHS, BENCHMARKS_INFO, ML_INPUT_PARTIONS
+from common import PATHS
 
-TARGET_BENCHMARKS = os.path.dirname(os.path.abspath(__file__)) + '/../tage_stats'
-HARD_BR_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../hard_br'
-HARD_BR_ACC_DIR = os.path.dirname(os.path.abspath(__file__)) + '/../hard_br_acc'
+TARGET_BENCHMARKS = os.path.dirname(os.path.abspath(__file__)) + PATHS['tage_stats_dir']
+HARD_BR_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['hard_br_dir']
+HARD_BR_ACC_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['hard_br_acc_dir']
 TAGE_CONFIG_NAME = 'tagescl64'
 NUM_BRS_TO_PRINT = 100
 PRODUCE_HARD_BR_FILES = True
@@ -22,24 +22,10 @@ def main():
         trace_path = TARGET_BENCHMARKS + "/" + trace
         data = pd.read_csv(trace_path, usecols=['Branch PC', 'Mispredictions'])
         data = data.head(TOP+1)
-        # sorted_data = data.sort_values(by='Accuracy')
         
         for index,row in data.iterrows():
            if index>0:
               brs.append(int(row['Branch PC'],16))
-
-        # validation_inputs = ML_INPUT_PARTIONS[benchmark]['validation_set']
-        # test_inputs = ML_INPUT_PARTIONS[benchmark]['test_set']
-
-        #brs = get_input_set_stats(benchmark, validation_inputs)
-
-        # Uncomment this line to observe test set stats using the selected
-        # branches.
-        #get_input_set_stats(benchmark, test_inputs, brs=brs)
-
-        # Uncomment this line to observe the stats of top mispredicting
-        # branches of the test set.
-        #get_input_set_stats(benchmark, test_inputs)
 
         if PRODUCE_HARD_BR_FILES:
             os.makedirs(HARD_BR_DIR, exist_ok=True)
