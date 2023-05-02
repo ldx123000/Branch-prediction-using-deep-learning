@@ -169,3 +169,12 @@ Finally we're ready to actually training and evaluate a neural network model!
 In *./environment_setup/paths.yaml*, define *result_BranchNet*, *result_CNN* and *result_SNN*: relative path to a directory for results of the ML jobs.
 
 Open *./src/branchnet/run.py* , *./src/My_deep_learning_model/CNN_run* and *./src/My_deep_learning_model/SNN_run* to run corresponding ML jobs.
+```
+./src/branchnet/run.py
+```
+```
+./src/My_deep_learning_model/CNN_run
+```
+```
+./src/My_deep_learning_model/SNN_run
+```
