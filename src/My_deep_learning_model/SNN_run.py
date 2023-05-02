@@ -306,7 +306,6 @@ def run_on(branches):
     lst = []
     for _ in range(10):
       model = CNN(config)
-      test_model = CNN_no_bn(config)
       snn_model = SNN(config)
       try:
         cf = config
@@ -340,10 +339,6 @@ def run_on(branches):
         reshape_dict = {}
         print(src_dict.keys())
         for (k, v) in src_dict.items():
-              # if k=="stem.0.weight":
-                  # reshape_dict['stem.weight'] = nn.Parameter(v.reshape(dst_dict['stem.weight'].shape)*6)   
-              # if k=="head.0.weight":
-                  # reshape_dict['head.weight'] = nn.Parameter(v.reshape(dst_dict['head.weight'].shape)*6)
               if k in dst_dict.keys():
                   dst_dict[k] = torch.tensor(dst_dict[k], dtype=torch.float32)
                   v = torch.tensor(v, dtype=torch.float32)
@@ -355,34 +350,8 @@ def run_on(branches):
                   #reshape_dict['embedding_table.weight'] = src_dict['embedding_table.weight']
 
         snn_model.load_state_dict(reshape_dict, strict=False)
-
-        dst_dict = copy.deepcopy(test_model.state_dict())
-        for (k, v) in src_dict.items():
-              # if k=="stem.0.weight":
-                  # reshape_dict['stem.weight'] = nn.Parameter(v.reshape(dst_dict['stem.weight'].shape)*6)   
-              # if k=="head.0.weight":
-                  # reshape_dict['head.weight'] = nn.Parameter(v.reshape(dst_dict['head.weight'].shape)*6)
-              if k in dst_dict.keys():
-                  dst_dict[k] = torch.tensor(dst_dict[k], dtype=torch.float32)
-                  v = torch.tensor(v, dtype=torch.float32)
-                  # print('not miss', k, dst_dict[k].shape, v.reshape(dst_dict[k].shape).shape)
-                  if 'weight' in k:
-                      reshape_dict[k] = nn.Parameter(v.reshape(dst_dict[k].shape))
-                  else:
-                      reshape_dict[k] = nn.Parameter(v.reshape(dst_dict[k].shape))
-                  #reshape_dict['embedding_table.weight'] = src_dict['embedding_table.weight']
-        test_model.load_state_dict(reshape_dict, strict=False)
-
-        print('SNN')
       
         model_wrapper = ModelWrapper(snn_model,
-              br_pc= brpc,
-              branchnet_config=cf,
-              batch_size= bs,
-              cuda_device = cuda,
-              log_progress=lp)
-        
-        model_wrapper_2 = ModelWrapper(test_model,
               br_pc= brpc,
               branchnet_config=cf,
               batch_size= bs,
@@ -401,18 +370,10 @@ def run_on(branches):
         corrects, total, _ = model_wrapper.eval([test_traces])
         lst.append((corrects,total))
         accuracy_SNN = 0 if total == 0 else corrects/total
-
-        print('{}/{} accuracy of {}/{}: {} out of {} ({}%)'.format(
-            str(count) , str(len(branches)),test_traces, str(hex(brpc)), corrects, total, accuracy_SNN*100.0))
-
-        corrects, total, _ = model_wrapper_2.eval([test_traces])
-        accuracy = 0 if total == 0 else corrects/total
-        print('{}/{} accuracy of {}/{}: {} out of {} ({}%)'.format(
-            str(count) , str(len(branches)),test_traces, str(hex(brpc)), corrects, total, accuracy*100.0))
+        
         corrects, total, _ = model_wrapper_1.eval([test_traces])
         accuracy = 0 if total == 0 else corrects/total
-        print('{}/{} accuracy of {}/{}: {} out of {} ({}%)'.format(
-            str(count) , str(len(branches)),test_traces, str(hex(brpc)), corrects, total, accuracy*100.0))
+        
         
         if accuracy - accuracy_SNN < 0.01:
             break
@@ -423,7 +384,7 @@ def run_on(branches):
     cor+=corrects
     tot+=total
     accuracy = 0 if total == 0 else corrects/total
-    print('final: {}/{} accuracy of {}/{}: {} out of {} ({}%)'.format(
+    print('{}/{} accuracy of {}/{}: {} out of {} ({}%)'.format(
                   str(count) , str(len(branches)),test_traces, str(hex(brpc)), corrects, total, accuracy*100.0))
     print('{}/{} accuracy of {}/{}: {} out of {} ({}%)'.format(
                   str(count) , str(len(branches)),test_traces, str(hex(brpc)), corrects, total, accuracy*100.0),file=f)
@@ -443,7 +404,7 @@ for trace in os.listdir(TRAIN_FILE):
     res_path = OUTPUT_FILE + "/" + trace[:-13] + ".out"
 
     train_file = h5py.File(train_path, 'r')
-    test_file = h5py.File(test_path, 'r')#eval_path
+    test_file = h5py.File(test_path, 'r')
 
     branches = set(train_file.keys()).intersection(set(test_file.keys()))
     branches.discard('history')

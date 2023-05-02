@@ -7,7 +7,7 @@ import os
 BINARY_NAME = 'tagescl64'
 CONFIG_NAME = 'tagescl64'
 NUM_THREADS = 32
-TRACES_DIR = PATHS['test_traces_dir']
+TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['test_traces_dir']
 STATS_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['tage_stats_dir']
 FILE_SUFFIX = '.csv' 
 

@@ -7,8 +7,8 @@ import os
 BINARY_NAME = 'tagescl64'
 CONFIG_NAME = 'tagescl64'
 NUM_THREADS = 32
-TRAIN_TRACES_DIR = PATHS['train_traces_dir']
-TEST_TRACES_DIR = PATHS['test_traces_dir']
+TRAIN_TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['train_traces_dir']
+TEST_TRACES_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['test_traces_dir']
 
 OUT_TRAIN_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['output_traces_dir'] + '/training'
 OUT_TEST_DIR = os.path.dirname(os.path.abspath(__file__)) + PATHS['output_traces_dir'] + '/test'

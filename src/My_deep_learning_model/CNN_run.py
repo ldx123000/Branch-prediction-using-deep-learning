@@ -366,7 +366,7 @@ for trace in os.listdir(TRAIN_FILE):
     res_path = OUTPUT_FILE + "/" + trace[:-13] + ".out"
 
     train_file = h5py.File(train_path, 'r')
-    test_file = h5py.File(test_path, 'r')#eval_path
+    test_file = h5py.File(test_path, 'r')
 
     branches = set(train_file.keys()).intersection(set(test_file.keys()))
     branches.discard('history')
