@@ -16,6 +16,9 @@ My email is: ldx123000@gmail.com
 ```
 Package         Version
 --------------- -------
+catCpp          0.0.0
+catCuda         0.0.0
+catSNN          0.0.0
 h5py            3.8.0
 matplotlib      3.7.1
 numpy           1.24.2
@@ -23,6 +26,7 @@ PyYAML          6.0
 torch           1.13.1
 torchvision     0.14.1
 ```
+You can get the cat Package from https://github.com/zhoujuncc1/shenjingcat, and run install.sh.
 
 * Intel Pin Tool for generating branch traces (I've tested with 3.23)
 
