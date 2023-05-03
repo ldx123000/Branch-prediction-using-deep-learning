@@ -1,6 +1,12 @@
 # Branch prediction using deep learning
 
-This repository contains the source code for my FYP project, Branch prediction using deep learning.
+This repository contains the source code for my FYP project, Branch prediction using deep learning. (Liu Dongxu)
+
+This project explores the topic of branch prediction, a technique commonly used in modern computer processors to optimize instruction execution. The current state-of-the-art branch predictor, TAGE, struggles to identify correlated branches deep within a noisy global branch history, and fundamental breakthroughs in branch prediction have become increasingly rare. To address this issue and further improve branch prediction, this report suggests relaxing the constraint of runtime-only training and adopting more sophisticated prediction mechanisms that incorporate deep learning. Building on the work of Building on the work of BranchNet
+[BranchNet]: https://github.com/siavashzk/BranchNet, a convolutional neural networks (CNNs) with a practical on-chip inference engine tailored to the needs of branch prediction, the report proposes a better CNN model that requires fewer resources. In an effort to reduce the expensive computational cost of multiplication operations, the report implements a novel deep learning model called Spiking Neural Networks (SNNs) for prediction, which only utilizes addition operations while maintaining higher accuracy than TAGE.
+
+I'm Liu Dongxu, and if you have any question, feel free to mp me.
+My email is: ldx123000@gmail.com
 
 ## Dependencies 
 
@@ -84,6 +90,51 @@ Common headers (defines branch trace format).
 ### environment_setup
 
 This file contains the global paths that you need to define for using the helper scripts. I have committed example dummy version. Maybe all You need to do is to change *train_traces_dir* and *test_traces_dir* to your trace paths.
+
+### SimpleExamples
+
+Here is an example to use Pintool.
+
+1. move this directory to pin/source/tools
+
+```
+mv ~/Branch-prediction-using-deep-learning/SimpleExamples/ ~/pin-3.23-98579-gb15ab7903-gcc-linux/source/tools/
+```
+
+2. cd to SimpleExamples
+
+```
+cd ~/pin-3.23-98579-gb15ab7903-gcc-linux/source/tools/SimpleExamples/
+```
+
+3. "make clean; make" to test it out
+4. run pin directly to get the trace file
+
+```
+../../../pin -t obj-intel64/tracer.so -- /bin/ls
+```
+
+This will run /bin/ls (to use pin must specify the app’s full path) and create the trace file “tracer.out”.
+
+5. compress the trace to give tracer.out.bz2
+
+```
+bzip2 tracer.out
+```
+
+6. To get the traces, we can just run
+
+```
+./src/build/tracer/tagescl64 tracer.out.bz2 try.out
+```
+
+​      or run this to get Tage results
+
+```
+./src/build/tage/tagescl64 tracer.out.bz2 try.out
+```
+
+### 
 
 ### bin
 
