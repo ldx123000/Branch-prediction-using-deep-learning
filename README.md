@@ -232,3 +232,4 @@ Open *./src/branchnet/run.py* , *./src/My_deep_learning_model/CNN_run* and *./sr
 ```
 ./src/My_deep_learning_model/SNN_run
 ```
+You can get the traces here: https://drive.google.com/file/d/1oysnVwpcZd31NrqOGCNr_x3CPK6RtZbR/view?usp=sharing
